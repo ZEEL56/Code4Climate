@@ -26,11 +26,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       role: credentials.role,
       email: `${credentials.username}@example.com`
     };
-
+  
     setUser(mockUser);
     localStorage.setItem('user', JSON.stringify(mockUser));
+    // Navigation is handled by the Login component
   };
-
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
