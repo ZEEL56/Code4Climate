@@ -43,8 +43,8 @@ const MapCard: React.FC<MapCardProps> = ({
   subtitle, 
   markers, 
   height = 400,
-  center = [39.8283, -98.5795], // Center of USA
-  zoom = 4
+  center = [20.5937, 78.9629], // Center of India
+  zoom = 5
 }) => {
   const [isClient, setIsClient] = useState(false);
 

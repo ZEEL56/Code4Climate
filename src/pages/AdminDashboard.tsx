@@ -198,11 +198,13 @@ const AdminDashboard: React.FC = () => {
 
       {/* Geographic Distribution Map */}
       <MapCard
-        title="Geographic Data Distribution"
-        subtitle="All environmental monitoring locations across the network"
-        markers={mapMarkers}
-        height={500}
-      />
+  title="India Geographic Data Distribution"
+  subtitle="Environmental monitoring locations across India"
+  markers={mapMarkers}
+  height={500}
+  center={[20.5937, 78.9629]}
+  zoom={5}
+/>
     </ResponsiveLayout>
   );
 };

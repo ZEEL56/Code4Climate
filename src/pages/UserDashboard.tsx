@@ -182,7 +182,7 @@ const UserDashboard: React.FC = () => {
           title="Annual Temperature Trends"
           subtitle="Average monthly temperature across India (°C)"
           data={temperatureData}
-          type="line"
+          type="bar"
           height={300}
         />
         

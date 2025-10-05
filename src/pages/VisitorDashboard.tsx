@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ResponsiveLayout from '../components/layout/ResponsiveLayout';
 import Card from '../components/ui/Card';
 import ChartCard from '../components/charts/ChartCard';
@@ -13,6 +14,7 @@ const VisitorDashboard: React.FC = () => {
   const [dateChartData, setDateChartData] = useState<ChartData[]>([]);
   const [mapMarkers, setMapMarkers] = useState<MapMarker[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
@@ -42,102 +44,169 @@ const VisitorDashboard: React.FC = () => {
     return <LoadingScreen />;
   }
 
+  const features = [
+    {
+      icon: '🌍',
+      title: 'Climate Predictions',
+      description: 'AI-powered climate forecasts for India with travel recommendations',
+      action: 'Explore Climate Data'
+    },
+    {
+      icon: '📊',
+      title: 'Data Analytics',
+      description: 'Real-time environmental data visualization and insights',
+      action: 'View Analytics'
+    },
+    {
+      icon: '🗺️',
+      title: 'Interactive Maps',
+      description: 'Geographic distribution of monitoring stations and climate zones',
+      action: 'Explore Maps'
+    },
+    {
+      icon: '🛰️',
+      title: 'NASA Data',
+      description: 'Access satellite data and official climate measurements',
+      action: 'Browse Data'
+    }
+  ];
+
+  const quickStats = [
+    { label: 'Countries Covered', value: '195+', icon: '🌐' },
+    { label: 'Data Points', value: '10M+', icon: '📈' },
+    { label: 'Active Users', value: '50K+', icon: '👥' },
+    { label: 'Cities Tracked', value: '1000+', icon: '🏙️' }
+  ];
+
   return (
-    <ResponsiveLayout title="Public Environmental Data">
-            {/* Welcome Message */}
-            <div className="mb-6">
-              <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-xl p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <span className="text-3xl">🌍</span>
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-blue-800">
-                      Welcome to ClimateTrack Public Portal
-                    </h3>
-                    <div className="mt-2 text-sm text-blue-700">
-                      <p>Access real-time environmental data, air quality measurements, and climate monitoring information from our network of sensors across the United States.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+    <ResponsiveLayout title="ClimateTrack - Public Portal">
+      {/* Hero Section */}
+      <div className="visitor-hero-section">
+        <div className="visitor-hero-content">
+          <h1 className="visitor-hero-title">🌍 Welcome to ClimateTrack</h1>
+          <p className="visitor-hero-subtitle">
+            Your gateway to real-time climate data, AI-powered predictions, and environmental insights powered by NASA
+          </p>
+          <div className="visitor-hero-buttons">
+            <button onClick={() => navigate('/login')} className="hero-btn-primary">
+              Sign In to Access Full Features
+            </button>
+            <button className="hero-btn-secondary">
+              Learn More
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="quick-stats-grid">
+        {quickStats.map((stat, index) => (
+          <div key={index} className="quick-stat-card">
+            <div className="stat-icon">{stat.icon}</div>
+            <div className="stat-value">{stat.value}</div>
+            <div className="stat-label">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Platform Features */}
+      <Card title="Platform Features" subtitle="Explore what ClimateTrack offers">
+        <div className="features-grid">
+          {features.map((feature, index) => (
+            <div key={index} className="feature-card">
+              <div className="feature-icon">{feature.icon}</div>
+              <h3 className="feature-title">{feature.title}</h3>
+              <p className="feature-description">{feature.description}</p>
+              <button className="feature-action-btn">{feature.action} →</button>
             </div>
+          ))}
+        </div>
+      </Card>
 
-            {/* Stats Cards */}
-            {stats && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="dashboard-card">
-                  <div className="icon primary">🌡️</div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Active Monitoring Stations</h3>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalSubmissions}</p>
-                </div>
+      
 
-                <div className="dashboard-card">
-                  <div className="icon success">✅</div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Verified Data Points</h3>
-                  <p className="text-3xl font-bold text-gray-900">{stats.approvedSubmissions}</p>
-                </div>
+           
+      {/* Data Visualizations */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <ChartCard
+          title="Data Quality Distribution"
+          subtitle="Environmental data verification status"
+          data={submissionsChartData}
+          type="pie"
+          height={300}
+        />
+        
+        <ChartCard
+          title="Collection Activity Trends"
+          subtitle="Daily data collection patterns"
+          data={dateChartData}
+          type="bar"
+          height={300}
+        />
+      </div>
 
-                <div className="dashboard-card">
-                  <div className="icon warning">⏳</div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Under Review</h3>
-                  <p className="text-3xl font-bold text-gray-900">{stats.pendingSubmissions}</p>
-                </div>
+      <MapCard
+  title="India Environmental Monitoring Network"
+  subtitle="Real-time sensor locations and climate data collection points across India"
+  markers={mapMarkers}
+  height={500}
+  center={[20.5937, 78.9629]}
+  zoom={5}
+/>
+    
 
-                <div className="dashboard-card">
-                  <div className="icon danger">⚠️</div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Data Quality Issues</h3>
-                  <p className="text-3xl font-bold text-gray-900">{stats.rejectedSubmissions}</p>
-                </div>
-              </div>
-            )}
+      {/* Climate Insights Preview */}
+      <Card title="Climate Insights for India" subtitle="Preview of travel climate predictions">
+        <div className="climate-preview-grid">
+          <div className="climate-preview-card">
+            <div className="preview-icon">🌤️</div>
+            <h4 className="preview-title">Delhi</h4>
+            <div className="preview-temp">28°C</div>
+            <p className="preview-condition">Clear Sky</p>
+          </div>
+          <div className="climate-preview-card">
+            <div className="preview-icon">⛅</div>
+            <h4 className="preview-title">Mumbai</h4>
+            <div className="preview-temp">32°C</div>
+            <p className="preview-condition">Partly Cloudy</p>
+          </div>
+          <div className="climate-preview-card">
+            <div className="preview-icon">🌤️</div>
+            <h4 className="preview-title">Bangalore</h4>
+            <div className="preview-temp">25°C</div>
+            <p className="preview-condition">Pleasant</p>
+          </div>
+          <div className="climate-preview-card">
+            <div className="preview-icon">🌡️</div>
+            <h4 className="preview-title">Chennai</h4>
+            <div className="preview-temp">34°C</div>
+            <p className="preview-condition">Hot & Humid</p>
+          </div>
+        </div>
+        <div className="text-center mt-6">
+          <button onClick={() => navigate('/login')} className="upgrade-btn">
+            Sign In for Detailed Climate Predictions →
+          </button>
+        </div>
+      </Card>
 
-            {/* Charts and Map */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <ChartCard
-                title="Data Quality Overview"
-                subtitle="Distribution of environmental data by verification status"
-                data={submissionsChartData}
-                type="pie"
-                height={300}
-              />
-              
-              <ChartCard
-                title="Data Collection Trends"
-                subtitle="Daily environmental data collection activity"
-                data={dateChartData}
-                type="bar"
-                height={300}
-              />
-            </div>
-
-            {/* Map */}
-            <div className="mb-8">
-              <MapCard
-                title="Environmental Monitoring Network"
-                subtitle="Real-time sensor locations and data collection points across the United States"
-                markers={mapMarkers}
-                height={500}
-              />
-            </div>
-
-            {/* Restricted Actions Notice */}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-              <div className="text-center">
-                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100 mb-4">
-                  <span className="text-gray-600 text-xl">🔒</span>
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Want to submit data?
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Log in with a registered user account to submit location data, or use an admin account to approve submissions.
-                </p>
-                <button className="btn-primary">
-                  Switch Account
-                </button>
-              </div>
-            </div>
+      {/* Call to Action */}
+      <div className="visitor-cta-section">
+        <div className="cta-content">
+          <h2 className="cta-title">Ready to Access Full Features?</h2>
+          <p className="cta-description">
+            Create an account to unlock climate predictions, data submission, and advanced analytics
+          </p>
+          <div className="cta-buttons">
+            <button onClick={() => navigate('/login')} className="cta-btn-primary">
+              Create Free Account
+            </button>
+            <button onClick={() => navigate('/login')} className="cta-btn-secondary">
+              Sign In
+            </button>
+          </div>
+        </div>
+      </div>
     </ResponsiveLayout>
   );
 };
