@@ -19,7 +19,6 @@ const Login: React.FC = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     login({ username, password, role: selectedRole });
     
-    // Navigate to appropriate dashboard based on role
     const dashboardRoutes = {
       visitor: '/visitor-dashboard',
       user: '/user-dashboard',
@@ -28,6 +27,12 @@ const Login: React.FC = () => {
     
     navigate(dashboardRoutes[selectedRole]);
     setIsLoading(false);
+  };
+
+  const handleVisitorAccess = () => {
+    // Auto-login as visitor without credentials
+    login({ username: 'Guest User', password: '', role: 'visitor' });
+    navigate('/visitor-dashboard');
   };
 
   const handleCreateAccount = () => {
@@ -48,9 +53,9 @@ const Login: React.FC = () => {
 
       <div className="nasa-login-card">
         <div className="nasa-header">
-        <div className="nasa-logo-container">
-  <img src="/logo.png" alt="Code4Climate Logo" className="nasa-logo-img" />
-</div>
+          <div className="nasa-logo-container">
+            <img src="/logo.png.jpeg" alt="Code4Climate Logo" className="nasa-logo-img" />
+          </div>
           <h1 className="nasa-title">ClimateTrack</h1>
           <p className="nasa-subtitle">Environmental Data Platform</p>
           <div className="nasa-badge">
@@ -115,6 +120,21 @@ const Login: React.FC = () => {
                 {showPassword ? '👁️' : '👁️‍🗨️'}
               </button>
             </div>
+          </div>
+
+          {/* Continue as Visitor Button */}
+          <div className="visitor-access-section">
+            <button
+              type="button"
+              onClick={handleVisitorAccess}
+              className="visitor-access-button"
+            >
+              <span className="visitor-icon">🌍</span>
+              <div className="visitor-text-content">
+                <span className="visitor-button-title">Continue as Visitor</span>
+                <span className="visitor-button-desc">Browse public data and climate predictions without signing in</span>
+              </div>
+            </button>
           </div>
 
           <div className="nasa-forgot-password">

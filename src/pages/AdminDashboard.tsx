@@ -9,14 +9,13 @@ import { mockApi } from '../services/mockApi';
 import { ChartData, MapMarker, LocationData, DashboardStats } from '../types';
 
 const AdminDashboard: React.FC = () => {
-  const [pendingSubmissions, setPendingSubmissions] = useState<LocationData[]>([]);
-  const [approvedSubmissions, setApprovedSubmissions] = useState<LocationData[]>([]);
+  const [allSubmissions, setAllSubmissions] = useState<LocationData[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [submissionsChartData, setSubmissionsChartData] = useState<ChartData[]>([]);
   const [dateChartData, setDateChartData] = useState<ChartData[]>([]);
   const [mapMarkers, setMapMarkers] = useState<MapMarker[]>([]);
   const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
 
   useEffect(() => {
     loadData();
@@ -24,17 +23,15 @@ const AdminDashboard: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const [pendingData, approvedData, statsData, chartData, dateData, markersData] = await Promise.all([
-        mockApi.getLocationDataByStatus('pending'),
-        mockApi.getLocationDataByStatus('approved'),
+      const [allData, statsData, chartData, dateData, markersData] = await Promise.all([
+        mockApi.getLocationData(),
         mockApi.getDashboardStats(),
         mockApi.getSubmissionsChartData(),
         mockApi.getSubmissionsByDateChartData(),
         mockApi.getMapMarkers()
       ]);
 
-      setPendingSubmissions(pendingData);
-      setApprovedSubmissions(approvedData);
+      setAllSubmissions(allData);
       setStats(statsData);
       setSubmissionsChartData(chartData);
       setDateChartData(dateData);
@@ -46,196 +43,166 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleStatusUpdate = async (id: string, status: 'approved' | 'rejected') => {
-    setProcessing(id);
-    try {
-      await mockApi.updateLocationStatus(id, status);
-      await loadData(); // Refresh all data
-    } catch (error) {
-      console.error('Error updating status:', error);
-    } finally {
-      setProcessing(null);
-    }
+  const getFilteredSubmissions = () => {
+    if (filterStatus === 'all') return allSubmissions;
+    return allSubmissions.filter(sub => sub.status === filterStatus);
   };
+
+  const filteredSubmissions = getFilteredSubmissions();
 
   if (loading) {
     return <LoadingScreen />;
   }
 
   return (
-    <ResponsiveLayout title="System Administration">
-            {/* Stats Cards */}
-            {stats && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="dashboard-card">
-                  <div className="icon primary">🌡️</div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Total Data Points</h3>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalSubmissions}</p>
-                </div>
+    <ResponsiveLayout title="Data Management Dashboard">
+      {/* Stats Overview */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="dashboard-card">
+            <div className="icon primary">📊</div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">Total Submissions</h3>
+            <p className="text-3xl font-bold text-gray-900">{stats.totalSubmissions}</p>
+          </div>
 
-                <div className="dashboard-card">
-                  <div className="icon warning">⏳</div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Awaiting Review</h3>
-                  <p className="text-3xl font-bold text-gray-900">{stats.pendingSubmissions}</p>
-                </div>
+          <div className="dashboard-card">
+            <div className="icon success">✅</div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">Approved Data</h3>
+            <p className="text-3xl font-bold text-gray-900">{stats.approvedSubmissions}</p>
+          </div>
 
-                <div className="dashboard-card">
-                  <div className="icon success">✅</div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Quality Verified</h3>
-                  <p className="text-3xl font-bold text-gray-900">{stats.approvedSubmissions}</p>
-                </div>
+          <div className="dashboard-card">
+            <div className="icon warning">⏳</div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">Pending Review</h3>
+            <p className="text-3xl font-bold text-gray-900">{stats.pendingSubmissions}</p>
+          </div>
 
-                <div className="dashboard-card">
-                  <div className="icon danger">⚠️</div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Quality Issues</h3>
-                  <p className="text-3xl font-bold text-gray-900">{stats.rejectedSubmissions}</p>
-                </div>
-              </div>
-            )}
+          <div className="dashboard-card">
+            <div className="icon danger">❌</div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">Rejected Data</h3>
+            <p className="text-3xl font-bold text-gray-900">{stats.rejectedSubmissions}</p>
+          </div>
+        </div>
+      )}
 
-            {/* Pending Requests Table */}
-            <Card title="Data Quality Review Queue" subtitle="Environmental data submissions requiring quality verification" className="mb-8">
-              {pendingSubmissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <span className="text-4xl mb-4 block">✅</span>
-                  <p>No pending submissions. All caught up!</p>
-                </div>
+      {/* Data Filter */}
+      <Card title="All Submissions Data" subtitle="View and analyze all environmental data submissions" className="mb-8">
+        <div className="mb-6">
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`filter-button ${filterStatus === 'all' ? 'filter-button-active' : ''}`}
+            >
+              All Data ({allSubmissions.length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('approved')}
+              className={`filter-button ${filterStatus === 'approved' ? 'filter-button-active' : ''}`}
+            >
+              ✅ Approved ({allSubmissions.filter(s => s.status === 'approved').length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('pending')}
+              className={`filter-button ${filterStatus === 'pending' ? 'filter-button-active' : ''}`}
+            >
+              ⏳ Pending ({allSubmissions.filter(s => s.status === 'pending').length})
+            </button>
+            <button
+              onClick={() => setFilterStatus('rejected')}
+              className={`filter-button ${filterStatus === 'rejected' ? 'filter-button-active' : ''}`}
+            >
+              ❌ Rejected ({allSubmissions.filter(s => s.status === 'rejected').length})
+            </button>
+          </div>
+        </div>
+
+        {/* Data Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date & Time
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Location
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Coordinates
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Submitted
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredSubmissions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                    No submissions found for this filter
+                  </td>
+                </tr>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date & Time
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Location
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User ID
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Submitted
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {pendingSubmissions.map((submission) => (
-                        <tr key={submission.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {submission.date} at {submission.time}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
-                            {submission.location.address}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {submission.userId}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(submission.submittedAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <button
-                              onClick={() => handleStatusUpdate(submission.id, 'approved')}
-                              disabled={processing === submission.id}
-                              className="btn-success text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {processing === submission.id ? 'Processing...' : 'Approve'}
-                            </button>
-                            <button
-                              onClick={() => handleStatusUpdate(submission.id, 'rejected')}
-                              disabled={processing === submission.id}
-                              className="btn-danger text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {processing === submission.id ? 'Processing...' : 'Reject'}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                filteredSubmissions.map((submission) => (
+                  <tr key={submission.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                      {submission.id.substring(0, 8)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {submission.date} at {submission.time}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {submission.location.address}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">
+                      {submission.location.lat.toFixed(4)}, {submission.location.lng.toFixed(4)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <StatusBadge status={submission.status} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(submission.submittedAt).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
               )}
-            </Card>
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
-            {/* Approved Data Table */}
-            <Card title="Approved Data" subtitle="Recently approved submissions" className="mb-8">
-              {approvedSubmissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <span className="text-4xl mb-4 block">📋</span>
-                  <p>No approved submissions yet.</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date & Time
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Location
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User ID
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {approvedSubmissions.slice(0, 10).map((submission) => (
-                        <tr key={submission.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {submission.date} at {submission.time}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
-                            {submission.location.address}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {submission.userId}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <StatusBadge status={submission.status} />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </Card>
+      {/* Analytics Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <ChartCard
+          title="Data Distribution by Status"
+          subtitle="Overview of all environmental data submissions"
+          data={submissionsChartData}
+          type="pie"
+          height={300}
+        />
+        
+        <ChartCard
+          title="Submission Trends"
+          subtitle="Daily submission activity over time"
+          data={dateChartData}
+          type="bar"
+          height={300}
+        />
+      </div>
 
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <ChartCard
-                title="Submissions by Status"
-                subtitle="Distribution of all submissions"
-                data={submissionsChartData}
-                type="pie"
-                height={300}
-              />
-              
-              <ChartCard
-                title="Submissions by Date"
-                subtitle="Daily submission trends"
-                data={dateChartData}
-                type="bar"
-                height={300}
-              />
-            </div>
-
-            {/* Map Overview */}
-            <MapCard
-              title="Map Overview"
-              subtitle="Geographic distribution of all submissions"
-              markers={mapMarkers}
-              height={500}
-            />
+      {/* Geographic Distribution Map */}
+      <MapCard
+        title="Geographic Data Distribution"
+        subtitle="All environmental monitoring locations across the network"
+        markers={mapMarkers}
+        height={500}
+      />
     </ResponsiveLayout>
   );
 };

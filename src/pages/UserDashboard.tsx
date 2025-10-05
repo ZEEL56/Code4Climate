@@ -2,53 +2,83 @@ import React, { useState, useEffect } from 'react';
 import ResponsiveLayout from '../components/layout/ResponsiveLayout';
 import Card from '../components/ui/Card';
 import ChartCard from '../components/charts/ChartCard';
-import MapCard from '../components/maps/MapCard';
-import StatusBadge from '../components/ui/StatusBadge';
 import LoadingScreen from '../components/ui/LoadingScreen';
 import { mockApi } from '../services/mockApi';
-import type { ChartData, MapMarker, LocationData } from '../types';
+import type { ChartData } from '../types';
 
-interface FormData {
-  date: string;
-  time: string;
-  location: {
-    lat: number;
-    lng: number;
-    address: string;
-  };
+interface CityForecast {
+  city: string;
+  state: string;
+  temp: number;
+  condition: string;
+  precipitation: number;
+  humidity: number;
+  icon: string;
+  recommendation: string;
 }
 
 const UserDashboard: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    date: '',
-    time: '',
-    location: { lat: 0, lng: 0, address: '' }
-  });
-  const [userSubmissions, setUserSubmissions] = useState<LocationData[]>([]);
-  const [submissionsChartData, setSubmissionsChartData] = useState<ChartData[]>([]);
-  const [dateChartData, setDateChartData] = useState<ChartData[]>([]);
-  const [mapMarkers, setMapMarkers] = useState<MapMarker[]>([]);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [showMap, setShowMap] = useState(false);
+  const [selectedRegion, setSelectedRegion] = useState('all');
+  const [temperatureData, setTemperatureData] = useState<ChartData[]>([]);
+  const [precipitationData, setPrecipitationData] = useState<ChartData[]>([]);
+
+  const cityForecasts: CityForecast[] = [
+    { city: 'Mumbai', state: 'Maharashtra', temp: 32, condition: 'Partly Cloudy', precipitation: 45, humidity: 78, icon: '⛅', recommendation: 'Good for travel' },
+    { city: 'Delhi', state: 'Delhi', temp: 28, condition: 'Clear', precipitation: 10, humidity: 45, icon: '☀️', recommendation: 'Excellent for sightseeing' },
+    { city: 'Bangalore', state: 'Karnataka', temp: 25, condition: 'Pleasant', precipitation: 20, humidity: 60, icon: '🌤️', recommendation: 'Perfect weather' },
+    { city: 'Chennai', state: 'Tamil Nadu', temp: 34, condition: 'Hot & Humid', precipitation: 55, humidity: 82, icon: '🌡️', recommendation: 'Stay hydrated' },
+    { city: 'Kolkata', state: 'West Bengal', temp: 31, condition: 'Humid', precipitation: 40, humidity: 75, icon: '☁️', recommendation: 'Carry umbrella' },
+    { city: 'Jaipur', state: 'Rajasthan', temp: 38, condition: 'Very Hot', precipitation: 5, humidity: 25, icon: '🔥', recommendation: 'Avoid midday sun' },
+    { city: 'Goa', state: 'Goa', temp: 30, condition: 'Tropical', precipitation: 65, humidity: 80, icon: '🌴', recommendation: 'Beach weather' },
+    { city: 'Shimla', state: 'Himachal Pradesh', temp: 18, condition: 'Cool', precipitation: 15, humidity: 55, icon: '🏔️', recommendation: 'Ideal for trekking' },
+  ];
+
+  const climateZones = [
+    { name: 'Tropical Wet', color: '#10b981', regions: 'Kerala, Goa, Western Ghats' },
+    { name: 'Tropical Dry', color: '#f59e0b', regions: 'Central India, Deccan Plateau' },
+    { name: 'Subtropical Humid', color: '#3b82f6', regions: 'Northern Plains, Eastern India' },
+    { name: 'Mountain', color: '#8b5cf6', regions: 'Himalayas, Kashmir' },
+    { name: 'Arid', color: '#ef4444', regions: 'Rajasthan, Gujarat' },
+  ];
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [submissionsData, chartData, dateData, markersData] = await Promise.all([
-          mockApi.getLocationData(),
-          mockApi.getSubmissionsChartData(),
-          mockApi.getSubmissionsByDateChartData(),
-          mockApi.getMapMarkers()
+        // Simulate loading climate data
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        setTemperatureData([
+          { name: 'Jan', value: 22 },
+          { name: 'Feb', value: 24 },
+          { name: 'Mar', value: 28 },
+          { name: 'Apr', value: 32 },
+          { name: 'May', value: 35 },
+          { name: 'Jun', value: 33 },
+          { name: 'Jul', value: 30 },
+          { name: 'Aug', value: 29 },
+          { name: 'Sep', value: 30 },
+          { name: 'Oct', value: 28 },
+          { name: 'Nov', value: 25 },
+          { name: 'Dec', value: 23 },
         ]);
 
-        // Filter user's own submissions (in real app, this would be filtered by actual user ID)
-        setUserSubmissions(submissionsData.filter(sub => sub.userId === 'user1'));
-        setSubmissionsChartData(chartData);
-        setDateChartData(dateData);
-        setMapMarkers(markersData);
+        setPrecipitationData([
+          { name: 'Jan', value: 15 },
+          { name: 'Feb', value: 20 },
+          { name: 'Mar', value: 25 },
+          { name: 'Apr', value: 35 },
+          { name: 'May', value: 60 },
+          { name: 'Jun', value: 150 },
+          { name: 'Jul', value: 280 },
+          { name: 'Aug', value: 250 },
+          { name: 'Sep', value: 180 },
+          { name: 'Oct', value: 90 },
+          { name: 'Nov', value: 40 },
+          { name: 'Dec', value: 20 },
+        ]);
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error('Error loading climate data:', error);
       } finally {
         setLoading(false);
       }
@@ -57,264 +87,143 @@ const UserDashboard: React.FC = () => {
     loadData();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === 'lat' || name === 'lng') {
-      setFormData(prev => ({
-        ...prev,
-        location: {
-          ...prev.location,
-          [name]: parseFloat(value) || 0
-        }
-      }));
-    } else if (name === 'address') {
-      setFormData(prev => ({
-        ...prev,
-        location: {
-          ...prev.location,
-          address: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
-
-  const handleMapClick = (lat: number, lng: number) => {
-    setFormData(prev => ({
-      ...prev,
-      location: {
-        ...prev.location,
-        lat,
-        lng,
-        address: `${lat.toFixed(4)}, ${lng.toFixed(4)}`
-      }
-    }));
-    setShowMap(false);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    try {
-      const newSubmission = await mockApi.submitLocationData({
-        ...formData,
-        userId: 'user1' // In real app, this would come from auth context
-      });
-
-      setUserSubmissions(prev => [newSubmission, ...prev]);
-      setFormData({
-        date: '',
-        time: '',
-        location: { lat: 0, lng: 0, address: '' }
-      });
-
-      // Refresh data
-      const [chartData, dateData, markersData] = await Promise.all([
-        mockApi.getSubmissionsChartData(),
-        mockApi.getSubmissionsByDateChartData(),
-        mockApi.getMapMarkers()
-      ]);
-      setSubmissionsChartData(chartData);
-      setDateChartData(dateData);
-      setMapMarkers(markersData);
-    } catch (error) {
-      console.error('Error submitting data:', error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   if (loading) {
     return <LoadingScreen />;
   }
 
   return (
-    <ResponsiveLayout title="Data Contributor Portal">
-            {/* Input Form */}
-            <Card title="Submit Environmental Data" subtitle="Report environmental observations from your location for scientific analysis" className="mb-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
-                      Observation Date
-                    </label>
-                    <input
-                      type="date"
-                      id="date"
-                      name="date"
-                      value={formData.date}
-                      onChange={handleInputChange}
-                      required
-                      className="input-field"
-                    />
-                  </div>
+    <ResponsiveLayout title="Climate Prediction Portal">
+      {/* Hero Section */}
+      <div className="climate-hero-section">
+        <div className="climate-hero-content">
+          <h2 className="climate-hero-title">🇮🇳 Climate Forecast Prediction for India</h2>
+          <p className="climate-hero-subtitle">
+            Plan your travel with AI-powered climate predictions and real-time weather data across India
+          </p>
+        </div>
+      </div>
 
-                  <div>
-                    <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
-                      Observation Time
-                    </label>
-                    <input
-                      type="time"
-                      id="time"
-                      name="time"
-                      value={formData.time}
-                      onChange={handleInputChange}
-                      required
-                      className="input-field"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monitoring Location
-                  </label>
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.location.address}
-                      onChange={handleInputChange}
-                      placeholder="Enter monitoring station name or location description"
-                      required
-                      className="input-field"
-                    />
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="number"
-                        name="lat"
-                        value={formData.location.lat || ''}
-                        onChange={handleInputChange}
-                        placeholder="Latitude"
-                        step="any"
-                        className="input-field"
-                      />
-                      <input
-                        type="number"
-                        name="lng"
-                        value={formData.location.lng || ''}
-                        onChange={handleInputChange}
-                        placeholder="Longitude"
-                        step="any"
-                        className="input-field"
-                      />
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setShowMap(!showMap)}
-                      className="btn-secondary text-sm"
-                    >
-                      {showMap ? 'Hide Map' : 'Select from Map'}
-                    </button>
-
-                    {showMap && (
-                      <div className="border border-gray-200 rounded-lg overflow-hidden">
-                        <MapCard
-                          title=""
-                          markers={[]}
-                          height={300}
-                          center={[formData.location.lat || 39.8283, formData.location.lng || -98.5795]}
-                          zoom={6}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {submitting ? 'Submitting...' : 'Submit Data for Admin Approval'}
-                  </button>
-                </div>
-              </form>
-            </Card>
-
-            {/* User Submissions Table */}
-            <Card title="My Submissions" subtitle="Your submitted location data" className="mb-8">
-              {userSubmissions.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <span className="text-4xl mb-4 block">📋</span>
-                  <p>No submissions yet. Submit your first location data above!</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date & Time
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Location
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Submitted
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {userSubmissions.map((submission) => (
-                        <tr key={submission.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {submission.date} at {submission.time}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
-                            {submission.location.address}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <StatusBadge status={submission.status} />
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(submission.submittedAt).toLocaleDateString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </Card>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <ChartCard
-                title="All Submissions by Status"
-                subtitle="Overall distribution across all users"
-                data={submissionsChartData}
-                type="pie"
-                height={300}
-              />
-              
-              <ChartCard
-                title="Submissions by Date"
-                subtitle="Daily submission trends"
-                data={dateChartData}
-                type="bar"
-                height={300}
-              />
+      {/* Climate Zones */}
+      <Card title="India Climate Zones" subtitle="Understanding regional climate patterns">
+        <div className="climate-zones-grid">
+          {climateZones.map((zone) => (
+            <div key={zone.name} className="climate-zone-card">
+              <div className="climate-zone-indicator" style={{ backgroundColor: zone.color }}></div>
+              <div className="climate-zone-info">
+                <h4 className="climate-zone-name">{zone.name}</h4>
+                <p className="climate-zone-regions">{zone.regions}</p>
+              </div>
             </div>
+          ))}
+        </div>
+      </Card>
 
-            {/* Map */}
-            <MapCard
-              title="All Location Data"
-              subtitle="Geographic distribution of all submissions"
-              markers={mapMarkers}
-              height={500}
-            />
+      {/* India Map Placeholder */}
+      <Card title="Interactive India Climate Map" subtitle="Regional climate zones and current conditions">
+        <div className="india-map-container">
+          <div className="india-map-placeholder">
+            <div className="map-content">
+              <div className="india-map-icon">🗺️</div>
+              <h3 className="map-title">India Climate Zones Map</h3>
+              <p className="map-description">
+                Interactive visualization showing climate zones, temperature patterns, and precipitation across India
+              </p>
+              <div className="map-legend">
+                {climateZones.map((zone) => (
+                  <div key={zone.name} className="legend-item">
+                    <div className="legend-color" style={{ backgroundColor: zone.color }}></div>
+                    <span className="legend-label">{zone.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* City Forecasts */}
+      <Card title="Major Cities Weather Forecast" subtitle="Current conditions and 7-day predictions">
+        <div className="city-forecasts-grid">
+          {cityForecasts.map((forecast) => (
+            <div key={forecast.city} className="city-forecast-card">
+              <div className="city-forecast-header">
+                <div>
+                  <h4 className="city-name">{forecast.city}</h4>
+                  <p className="city-state">{forecast.state}</p>
+                </div>
+                <div className="weather-icon">{forecast.icon}</div>
+              </div>
+              <div className="temperature-display">
+                <span className="temp-value">{forecast.temp}°C</span>
+                <span className="temp-condition">{forecast.condition}</span>
+              </div>
+              <div className="forecast-details">
+                <div className="detail-item">
+                  <span className="detail-icon">💧</span>
+                  <span className="detail-text">{forecast.precipitation}mm</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-icon">💨</span>
+                  <span className="detail-text">{forecast.humidity}%</span>
+                </div>
+              </div>
+              <div className="travel-recommendation">
+                <span className="recommendation-icon">✈️</span>
+                <span className="recommendation-text">{forecast.recommendation}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Climate Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <ChartCard
+          title="Annual Temperature Trends"
+          subtitle="Average monthly temperature across India (°C)"
+          data={temperatureData}
+          type="line"
+          height={300}
+        />
+        
+        <ChartCard
+          title="Monsoon & Precipitation Patterns"
+          subtitle="Monthly rainfall distribution (mm)"
+          data={precipitationData}
+          type="bar"
+          height={300}
+        />
+      </div>
+
+      {/* Travel Recommendations */}
+      <Card title="Best Time to Visit" subtitle="Seasonal travel recommendations for India">
+        <div className="seasonal-recommendations">
+          <div className="season-card">
+            <div className="season-icon">🌸</div>
+            <h4 className="season-name">Spring (Feb-Mar)</h4>
+            <p className="season-desc">Pleasant weather, ideal for North India and hill stations</p>
+            <div className="season-temp">18-28°C</div>
+          </div>
+          <div className="season-card">
+            <div className="season-icon">☀️</div>
+            <h4 className="season-name">Summer (Apr-Jun)</h4>
+            <p className="season-desc">Visit hill stations and coastal areas to beat the heat</p>
+            <div className="season-temp">25-40°C</div>
+          </div>
+          <div className="season-card">
+            <div className="season-icon">🌧️</div>
+            <h4 className="season-name">Monsoon (Jul-Sep)</h4>
+            <p className="season-desc">Experience lush greenery in Western Ghats and Northeast</p>
+            <div className="season-temp">25-35°C</div>
+          </div>
+          <div className="season-card">
+            <div className="season-icon">🍂</div>
+            <h4 className="season-name">Winter (Oct-Jan)</h4>
+            <p className="season-desc">Perfect for exploring Rajasthan, South India, and beaches</p>
+            <div className="season-temp">10-25°C</div>
+          </div>
+        </div>
+      </Card>
     </ResponsiveLayout>
   );
 };
