@@ -16,42 +16,48 @@ const FeatureShowcase: React.FC<FeatureShowcaseProps> = ({ userType, isDarkMode 
       title: 'Global Climate Data',
       description: 'Access real-time climate data from NASA Earth Observatory and meteorological stations worldwide',
       color: '#4CAF50',
-      animation: 'pulse'
+      animation: 'pulse',
+      premium: false
     },
     {
       icon: '📊',
       title: 'Interactive Analytics',
       description: 'Explore climate trends through interactive charts, graphs, and data visualizations',
       color: '#2196F3',
-      animation: 'bounce'
+      animation: 'bounce',
+      premium: false
     },
     {
       icon: '🗺️',
       title: 'Climate Maps',
       description: 'Visualize climate data on interactive maps with satellite imagery and weather patterns',
       color: '#FF9800',
-      animation: 'rotate'
+      animation: 'rotate',
+      premium: false
     },
     {
       icon: '🔬',
       title: 'Scientific Research',
       description: 'Access peer-reviewed climate research and scientific publications',
       color: '#9C27B0',
-      animation: 'float'
+      animation: 'float',
+      premium: false
     },
     {
       icon: '📱',
       title: 'Mobile Optimized',
       description: 'Fully responsive design that works perfectly on all devices and screen sizes',
       color: '#00BCD4',
-      animation: 'shake'
+      animation: 'shake',
+      premium: false
     },
     {
       icon: '🌱',
       title: 'Environmental Impact',
       description: 'Learn about environmental changes and their global impact on ecosystems',
       color: '#8BC34A',
-      animation: 'glow'
+      animation: 'glow',
+      premium: false
     }
   ];
 
