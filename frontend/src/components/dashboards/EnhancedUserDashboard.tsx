@@ -5,6 +5,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import jsPDF from 'jspdf';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import FeatureShowcase from '../widgets/FeatureShowcase';
+import PersonalizedInsights from '../widgets/PersonalizedInsights';
 import Footer from '../Footer';
 import './EnhancedDashboard.css';
 import 'leaflet/dist/leaflet.css';
@@ -457,6 +459,12 @@ const EnhancedUserDashboard: React.FC = () => {
             </button>
           </div>
         )}
+
+        {/* Personalized AI Insights */}
+        <PersonalizedInsights isDarkMode={isDarkMode} />
+
+        {/* User Features Showcase */}
+        <FeatureShowcase userType="user" isDarkMode={isDarkMode} />
       </div>
       <Footer />
     </div>

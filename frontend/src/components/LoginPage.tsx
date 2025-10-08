@@ -158,14 +158,6 @@ const LoginPage: React.FC = () => {
             )}
           </form>
 
-          <div className="info-section">
-            <h4>🚀 Features:</h4>
-            <p>• AI-powered weather predictions</p>
-            <p>• Interactive climate maps</p>
-            <p>• NASA data integration</p>
-            <p>• Comfort index analysis</p>
-            <p>• Export predictions as PDF</p>
-          </div>
         </div>
       </div>
     </div>

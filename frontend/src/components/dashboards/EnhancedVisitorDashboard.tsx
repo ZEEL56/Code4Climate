@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import WeatherWidget from '../widgets/WeatherWidget';
 import ClimateDataPanel from '../widgets/ClimateDataPanel';
+import FeatureShowcase from '../widgets/FeatureShowcase';
 import Footer from '../Footer';
 import './EnhancedDashboard.css';
 
@@ -37,44 +38,6 @@ const EnhancedVisitorDashboard: React.FC = () => {
     { name: 'Stormy', value: 5, color: '#2F4F4F' }
   ];
 
-  const features = [
-    {
-      icon: '🤖',
-      title: 'AI Weather Predictions',
-      description: 'Advanced machine learning algorithms predict weather patterns up to 3 months ahead',
-      color: '#4CAF50'
-    },
-    {
-      icon: '📊',
-      title: 'Real-time Analytics',
-      description: 'Interactive charts and visualizations powered by NASA climate data',
-      color: '#2196F3'
-    },
-    {
-      icon: '🗺️',
-      title: 'Interactive Maps',
-      description: 'Explore climate data through interactive geographic visualizations',
-      color: '#FF9800'
-    },
-    {
-      icon: '🧠',
-      title: 'Comfort Analysis',
-      description: 'AI-powered comfort index analysis for optimal outdoor planning',
-      color: '#9C27B0'
-    },
-    {
-      icon: '📱',
-      title: 'Mobile Optimized',
-      description: 'Responsive design works perfectly on all devices and screen sizes',
-      color: '#00BCD4'
-    },
-    {
-      icon: '🔬',
-      title: 'Scientific Data',
-      description: 'Access to NASA Earth Observatory and meteorological research data',
-      color: '#795548'
-    }
-  ];
 
   // Update weather data periodically
   useEffect(() => {
@@ -132,24 +95,8 @@ const EnhancedVisitorDashboard: React.FC = () => {
         {/* Climate Data Panel */}
         <ClimateDataPanel isDarkMode={isDarkMode} />
 
-        {/* Features Grid */}
-        <div className="features-section">
-          <h3>🚀 Platform Features</h3>
-          <div className="features-grid">
-            {features.map((feature, index) => (
-              <div key={index} className="feature-card-enhanced">
-                <div className="feature-icon" style={{ color: feature.color }}>
-                  {feature.icon}
-                </div>
-                <div className="feature-content">
-                  <h4>{feature.title}</h4>
-                  <p>{feature.description}</p>
-                </div>
-                <div className="feature-glow" style={{ background: `linear-gradient(45deg, ${feature.color}, transparent)` }}></div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Features Showcase */}
+        <FeatureShowcase userType="visitor" isDarkMode={isDarkMode} />
 
         {/* Analytics Section */}
         <div className="analytics-section">
