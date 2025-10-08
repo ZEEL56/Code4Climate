@@ -24,16 +24,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="footer-section">
-          <h4>🚀 Features</h4>
-          <ul>
-            <li>AI Weather Predictions</li>
-            <li>Interactive Climate Maps</li>
-            <li>Comfort Index Analysis</li>
-            <li>PDF Export Reports</li>
-            <li>Real-time Data Updates</li>
-          </ul>
-        </div>
+
 
         <div className="footer-section">
           <h4>📊 Data Sources</h4>
@@ -46,17 +37,7 @@ const Footer: React.FC = () => {
           </ul>
         </div>
 
-        <div className="footer-section">
-          <h4>🔬 Technology</h4>
-          <ul>
-            <li>React & TypeScript</li>
-            <li>Firebase Authentication</li>
-            <li>Leaflet Maps</li>
-            <li>Recharts Analytics</li>
-            <li>AI Prediction Algorithms</li>
-          </ul>
-        </div>
-      </div>
+
 
       <div className="footer-bottom">
         <div className="nasa-credits">
