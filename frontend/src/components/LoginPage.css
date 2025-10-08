@@ -5,6 +5,11 @@
   justify-content: center;
   background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
   padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.login-container[data-theme="dark"] {
+  background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 100%);
 }
 
 .login-background {
@@ -44,6 +49,32 @@
 .logo-section {
   margin-bottom: 30px;
   margin-top: 30px;
+  position: relative;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: -20px;
+  right: 0;
+}
+
+.theme-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
 }
 
 .app-title {
@@ -224,7 +255,7 @@
   font-size: 1.2rem;
 }
 
-.demo-credentials {
+.info-section {
   margin-top: 30px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.05);
@@ -232,12 +263,12 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.demo-credentials h4 {
+.info-section h4 {
   margin: 0 0 15px 0;
   color: #4CAF50;
 }
 
-.demo-credentials p {
+.info-section p {
   margin: 5px 0;
   font-size: 0.9rem;
   opacity: 0.8;

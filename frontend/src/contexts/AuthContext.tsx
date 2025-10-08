@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
+import { auth, googleProvider } from '../config/firebase';
 
 export interface User {
   id: string;
@@ -10,6 +12,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string, role: 'user' | 'admin') => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   loginAsVisitor: () => void;
   logout: () => void;
   isAuthenticated: boolean;
@@ -37,29 +40,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (username: string, password: string, role: 'user' | 'admin'): Promise<boolean> => {
-    // Simulate API call - replace with actual authentication
-    if (role === 'admin' && username === 'admin' && password === 'admin123') {
-      const adminUser: User = {
-        id: '1',
-        username: 'admin',
-        email: 'admin@code4climate.com',
-        role: 'admin'
-      };
-      setUser(adminUser);
-      localStorage.setItem('user', JSON.stringify(adminUser));
-      return true;
-    } else if (role === 'user' && (username === 'user' || username === 'demo') && password === 'user123') {
-      const regularUser: User = {
-        id: '2',
+    // Accept any username and password for demo purposes
+    if (username.trim() && password.trim()) {
+      const newUser: User = {
+        id: Math.random().toString(36).substr(2, 9),
         username: username,
         email: `${username}@code4climate.com`,
-        role: 'user'
+        role: role
       };
-      setUser(regularUser);
-      localStorage.setItem('user', JSON.stringify(regularUser));
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
       return true;
     }
     return false;
+  };
+
+  const loginWithGoogle = async (): Promise<boolean> => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      const googleUser: User = {
+        id: user.uid,
+        username: user.displayName || user.email?.split('@')[0] || 'Google User',
+        email: user.email || '',
+        role: 'user'
+      };
+      
+      setUser(googleUser);
+      localStorage.setItem('user', JSON.stringify(googleUser));
+      return true;
+    } catch (error) {
+      console.error('Google login error:', error);
+      return false;
+    }
   };
 
   const loginAsVisitor = () => {
@@ -73,7 +87,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('user', JSON.stringify(visitorUser));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      if (user?.id !== 'visitor') {
+        await firebaseSignOut(auth);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     setUser(null);
     localStorage.removeItem('user');
   };
@@ -81,6 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value: AuthContextType = {
     user,
     login,
+    loginWithGoogle,
     loginAsVisitor,
     logout,
     isAuthenticated: !!user

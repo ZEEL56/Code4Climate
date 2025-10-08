@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import './LoginPage.css';
 
 const LoginPage: React.FC = () => {
@@ -8,7 +9,8 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, loginAsVisitor } = useAuth();
+  const { login, loginWithGoogle, loginAsVisitor } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +35,19 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    // Placeholder for Google login
-    alert('Google login integration coming soon!');
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const success = await loginWithGoogle();
+      if (!success) {
+        setError('Google login failed. Please try again.');
+      }
+    } catch (err) {
+      setError('Google login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {
@@ -53,10 +65,15 @@ const LoginPage: React.FC = () => {
           🌍
         </div>
         <div className="login-card">
-          <div className="logo-section">
-            <h1 className="app-title">CODE4CLIMATE</h1>
-            <p className="app-subtitle">Climate Data & Prediction Platform</p>
+        <div className="logo-section">
+          <div className="theme-toggle">
+            <button onClick={toggleTheme} className="theme-btn">
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
           </div>
+          <h1 className="app-title">CODE4CLIMATE</h1>
+          <p className="app-subtitle">AI-Powered Climate Data & Weather Prediction Platform</p>
+        </div>
 
           <div className="login-options">
             <button
@@ -132,6 +149,7 @@ const LoginPage: React.FC = () => {
                   type="button"
                   onClick={handleGoogleLogin}
                   className="google-btn"
+                  disabled={loading}
                 >
                   <span className="google-icon">🔍</span>
                   Login with Google
@@ -140,10 +158,13 @@ const LoginPage: React.FC = () => {
             )}
           </form>
 
-          <div className="demo-credentials">
-            <h4>Demo Credentials:</h4>
-            <p><strong>User:</strong> username: "user", password: "user123"</p>
-            <p><strong>Admin:</strong> username: "admin", password: "admin123"</p>
+          <div className="info-section">
+            <h4>🚀 Features:</h4>
+            <p>• AI-powered weather predictions</p>
+            <p>• Interactive climate maps</p>
+            <p>• NASA data integration</p>
+            <p>• Comfort index analysis</p>
+            <p>• Export predictions as PDF</p>
           </div>
         </div>
       </div>

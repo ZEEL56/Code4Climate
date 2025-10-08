@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import LoginPage from './components/LoginPage';
 import VisitorDashboard from './components/dashboards/VisitorDashboard';
-import UserDashboard from './components/dashboards/UserDashboard';
+import UserDashboard from './components/dashboards/EnhancedUserDashboard';
 import AdminDashboard from './components/dashboards/AdminDashboard';
 import './App.css';
 
@@ -43,13 +44,15 @@ const AppContent: React.FC = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="App">
-          <AppContent />
-        </div>
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <div className="App">
+            <AppContent />
+          </div>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
