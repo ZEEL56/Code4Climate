@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import LoginPage from './components/LoginPage';
-import VisitorDashboard from './components/dashboards/VisitorDashboard';
+import VisitorDashboard from './components/dashboards/EnhancedVisitorDashboard';
 import UserDashboard from './components/dashboards/EnhancedUserDashboard';
 import AdminDashboard from './components/dashboards/AdminDashboard';
 import './App.css';

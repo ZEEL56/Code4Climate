@@ -1,0 +1,259 @@
+.climate-data-panel {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 2rem 0;
+}
+
+.climate-data-panel.dark {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header {
+  margin-bottom: 2rem;
+}
+
+.nasa-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-icon {
+  font-size: 3rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.logo-text h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #4CAF50;
+  background: linear-gradient(45deg, #4CAF50, #2196F3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-text p {
+  margin: 0;
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.data-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.data-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(45deg, #4CAF50, #2196F3);
+}
+
+.data-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.climate-data-panel.dark .data-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.climate-data-panel.dark .data-card:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.data-icon {
+  font-size: 2rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.5; }
+}
+
+.card-body {
+  margin-bottom: 1rem;
+}
+
+.data-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.data-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #FFD700;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.data-change {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.change-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.change-value.positive {
+  color: #4CAF50;
+}
+
+.change-value.warning {
+  color: #FF9800;
+}
+
+.change-value.critical {
+  color: #F44336;
+}
+
+.change-label {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.data-description {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.card-footer {
+  margin-top: 1rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+  border-radius: 2px;
+}
+
+.panel-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  text-align: center;
+}
+
+.data-source {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.source-icon {
+  font-size: 1.2rem;
+  animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.data-attribution {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .climate-data-panel {
+    padding: 1rem;
+  }
+  
+  .data-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .data-card {
+    padding: 1rem;
+  }
+  
+  .nasa-logo {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .logo-icon {
+    font-size: 2rem;
+  }
+  
+  .logo-text h3 {
+    font-size: 1.2rem;
+  }
+}
